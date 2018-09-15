@@ -2,11 +2,18 @@ package com.naruto.helper;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 
 import com.naruto.view.R;
@@ -44,7 +51,7 @@ public class CustomViewHelper {
         this.view = view;
     }
 
-    public void init(TypedArray ta) {
+    public void getAttrs(TypedArray ta) {
         radius = ta.getDimensionPixelSize(getAttrsId("radius"), 0);
         strokeWidth = ta.getDimensionPixelSize(getAttrsId("strokeWidth"), dip2px(DEFAULT_STROKE_WIDTH));
         strokeColor = ta.getColor(getAttrsId("strokeColor"), DEFAULT_STROKE_COLOR);
@@ -138,6 +145,96 @@ public class CustomViewHelper {
         if (strokeType == STROKE_TYPE_DASH) {
             paint.setPathEffect(new DashPathEffect(new float[]{strokeDashLength, strokeDashInterval}, 0));
         }
+        drawRect(paint, canvas, rf);
+    }
+
+    /**
+     * 设置view为圆角
+     *
+     * @param canvas
+     */
+    public void makeToRoundRect(Canvas canvas) {
+        int paddingTop = view.getPaddingTop();
+        int paddingBottom = view.getPaddingBottom();
+        int paddingLeft = view.getPaddingLeft();
+        int paddingRight = view.getPaddingRight();
+        int r = radius - Math.min(Math.min(paddingLeft, paddingRight), Math.min(paddingTop, paddingBottom));
+        if (radius > 0 && r > 0 && view.getWidth() >= 2 * radius && view.getHeight() >= 2 * radius) {
+            Path path = new Path();
+            RectF rf = new RectF(canvas.getClipBounds());
+            rf.left += paddingLeft;
+            rf.top += paddingTop;
+            rf.right -= paddingRight;
+            rf.bottom -= paddingBottom;
+            path.addRoundRect(rf, r, r, Path.Direction.CW);
+            canvas.clipPath(path);
+        }
+    }
+
+    /**
+     * 获取圆角矩形图片方法
+     *
+     * @param bitmap
+     * @return Bitmap
+     * @author caizhiming
+     */
+    private Bitmap getRoundBitmap(Bitmap bitmap) {
+        Bitmap outputBitmap = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(outputBitmap);
+        Paint paint = new Paint();
+        final int color = 0xff424242;
+
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+
+        canvas.drawRoundRect(rectF, radius, radius, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        return outputBitmap;
+    }
+
+    private Bitmap drawableToBitmap(Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bd = (BitmapDrawable) drawable;
+            return bd.getBitmap();
+        }
+        // 当设置不为图片，为颜色时，获取的drawable宽高会有问题，所有当为颜色时候获取控件的宽高
+        int w = drawable.getIntrinsicWidth() <= 0 ? view.getWidth() : drawable.getIntrinsicWidth();
+        int h = drawable.getIntrinsicHeight() <= 0 ? view.getHeight() : drawable.getIntrinsicHeight();
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, w, h);
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+    /**
+     * 绘制遮罩层
+     *
+     * @param paint
+     * @param canvas
+     * @param maskLayerColor
+     */
+    public void drawMaskLayer(Paint paint, Canvas canvas, int maskLayerColor) {
+        paint.reset();
+        paint.setColor(maskLayerColor);
+        paint.setStyle(Paint.Style.FILL);
+        RectF rf = new RectF(canvas.getClipBounds());
+        drawRect(paint, canvas, rf);
+    }
+
+    /**
+     * 绘制矩形，填充或者描边
+     *
+     * @param paint
+     * @param canvas
+     * @param rf
+     */
+    public void drawRect(Paint paint, Canvas canvas, RectF rf) {
         if (radius > 0) {//圆角矩形
             paint.setAntiAlias(true);
             canvas.drawRoundRect(rf, radius, radius, paint);
@@ -147,24 +244,29 @@ public class CustomViewHelper {
     }
 
     /**
-     * 设置view为圆角
+     * 绘制圆角背景
      *
+     * @param paint
      * @param canvas
      */
-    public void makeToRoundrect(Canvas canvas) {
-        int paddingTop = view.getPaddingTop();
-        int paddingBottom = view.getPaddingBottom();
-        int paddingLeft = view.getPaddingLeft();
-        int paddingRight = view.getPaddingRight();
-        if (radius > 0 && view.getWidth() >= 2 * radius && view.getHeight() >= 2 * radius) {
-            Path path = new Path();
-            RectF rf = new RectF(canvas.getClipBounds());
-            rf.left += paddingLeft;
-            rf.top += paddingTop;
-            rf.right -= paddingRight;
-            rf.bottom -= paddingBottom;
-            path.addRoundRect(rf, radius - paddingLeft, radius - paddingBottom, Path.Direction.CW);
-            canvas.clipPath(path);
+    public void drawRoundRectBackground(Paint paint, Canvas canvas) {
+        Drawable background = view.getBackground();
+        if (radius > 0 && background != null) {//如果圆角半径>0且背景不为空，需要绘制圆角背景，需在父类调用onDraw()前，避免覆盖onDraw()结果
+            paint.reset();
+            Rect rect = canvas.getClipBounds();
+            Bitmap bitmap;
+            if (background instanceof ColorDrawable) {
+                ColorDrawable colorDrawable = (ColorDrawable) background;
+                int color = colorDrawable.getColor();
+
+                //生成纯色bitmap
+                bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
+                bitmap.eraseColor(color);//填充颜色
+            } else {
+                bitmap = drawableToBitmap(background);
+            }
+            Bitmap roundBitmap = getRoundBitmap(bitmap);
+            view.setBackgroundDrawable(new BitmapDrawable(roundBitmap));//用圆角化后的背景替换原有背景
         }
     }
 }

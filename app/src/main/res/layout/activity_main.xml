@@ -4,19 +4,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context="com.naruto.example.MainActivity">
 
+    <com.naruto.view.MaskLayerButton
+        android:id="@+id/bt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:background="@mipmap/ic_launcher"
+        app:radius="10dp"
+        app:strokeColor="@android:color/holo_red_light"
+        app:strokeDashInterval="3dp"
+        app:strokeDashLength="5dp"
+        app:strokeType="dash"
+        app:strokeWidth="2dp" />
+
     <com.naruto.view.FilletedCornerStrokeImageView
+        android:id="@+id/iv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_below="@id/bt"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
         android:adjustViewBounds="true"
-        android:padding="15dp"
+        android:paddingBottom="20dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="15dp"
+        android:paddingTop="10dp"
         android:src="@drawable/bibobobibobi"
-        app:radius="10dp"
+        app:radius="20dp"
         app:strokeColor="@android:color/holo_blue_light"
         app:strokeDashInterval="5dp"
         app:strokeDashLength="10dp"
         app:strokeType="dash"
         app:strokeWidth="2dp" />
+
+    <com.naruto.view.RoundRectRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv"
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        app:radius="15dp"
+        app:strokeColor="@android:color/holo_orange_light"
+        app:strokeType="dash"
+        app:strokeWidth="2dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_launcher" />
+    </com.naruto.view.RoundRectRelativeLayout>
 </RelativeLayout>

@@ -46,4 +46,15 @@
         <attr name="strokeDashInterval"></attr>
     </declare-styleable>
 
+    <declare-styleable name="RoundRectRelativeLayout">
+        <attr name="radius"></attr>
+        <attr name="constraintRadiusWithWidth_percent"></attr>
+        <attr name="constraintRadiusWithHeight_percent"></attr>
+        <attr name="strokeWidth"></attr>
+        <attr name="strokeColor"></attr>
+        <attr name="strokeType"></attr>
+        <attr name="strokeDashLength"></attr>
+        <attr name="strokeDashInterval"></attr>
+    </declare-styleable>
+
 </resources>
