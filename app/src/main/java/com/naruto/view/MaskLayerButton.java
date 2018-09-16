@@ -61,7 +61,7 @@ public class MaskLayerButton extends AppCompatButton {
     protected void onDraw(Canvas canvas) {
         Paint paint = new Paint();
         customViewHelper.setRadiusByPercent();
-        customViewHelper.drawRoundRectBackground(paint, canvas);
+        customViewHelper.makeBackgroundRoundRect(paint, canvas);
         super.onDraw(canvas);
         customViewHelper.drawStroke(paint, canvas);
         if (isNeedMaskLayer) {

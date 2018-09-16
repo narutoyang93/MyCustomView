@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
@@ -40,6 +41,8 @@ public class CustomViewHelper {
     private int strokeDashInterval;//虚线线段间隔
     private float constraintRadiusWithWidth_percent;//圆角半径相对于控件宽度的比例
     private float constraintRadiusWithHeight_percent;//圆角半径相对于控件高度的比例
+    private int backgroundWidth = -1;
+    private int backgroundHeight = -1;
     private Context context;
     private String customViewName;
     private View view;
@@ -212,6 +215,29 @@ public class CustomViewHelper {
         return bitmap;
     }
 
+    /***
+     * 缩放Bitmap
+     * @param bitmap
+     * @param newWidth
+     * @param newHeight
+     * @return
+     */
+    public static Bitmap resizeImage(Bitmap bitmap, int newWidth, int newHeight) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        if (width == newWidth && height == newHeight) {
+            return bitmap;
+        }
+
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        return newBitmap;
+    }
+
     /**
      * 绘制遮罩层
      *
@@ -244,14 +270,14 @@ public class CustomViewHelper {
     }
 
     /**
-     * 绘制圆角背景
+     * 使背景圆角
      *
      * @param paint
      * @param canvas
      */
-    public void drawRoundRectBackground(Paint paint, Canvas canvas) {
+    public void makeBackgroundRoundRect(Paint paint, Canvas canvas) {
         Drawable background = view.getBackground();
-        if (radius > 0 && background != null) {//如果圆角半径>0且背景不为空，需要绘制圆角背景，需在父类调用onDraw()前，避免覆盖onDraw()结果
+        if (radius > 0 && background != null) {
             paint.reset();
             Rect rect = canvas.getClipBounds();
             Bitmap bitmap;
@@ -263,7 +289,14 @@ public class CustomViewHelper {
                 bitmap = Bitmap.createBitmap(rect.width(), rect.height(), Bitmap.Config.ARGB_8888);
                 bitmap.eraseColor(color);//填充颜色
             } else {
-                bitmap = drawableToBitmap(background);
+                Bitmap b = drawableToBitmap(background);
+                if (backgroundWidth == -1) {
+                    backgroundWidth = b.getWidth() - view.getPaddingLeft() - view.getPaddingRight();
+                }
+                if (backgroundHeight == -1) {
+                    backgroundHeight = b.getHeight() - view.getPaddingTop() - view.getPaddingBottom();
+                }
+                bitmap = resizeImage(b, backgroundWidth, backgroundHeight);
             }
             Bitmap roundBitmap = getRoundBitmap(bitmap);
             view.setBackgroundDrawable(new BitmapDrawable(roundBitmap));//用圆角化后的背景替换原有背景

@@ -49,10 +49,12 @@ public class RoundRectRelativeLayout extends RelativeLayout {
         ta.recycle();
     }
 
+
     @Override
     protected void onDraw(Canvas canvas) {
         Paint paint = new Paint();
         customViewHelper.setRadiusByPercent();
+        customViewHelper.makeBackgroundRoundRect(paint, canvas);
         customViewHelper.drawStroke(paint, canvas);
         customViewHelper.makeToRoundRect(canvas);
         super.onDraw(canvas);
