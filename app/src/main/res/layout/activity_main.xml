@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
@@ -12,8 +13,10 @@
         android:id="@+id/bt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:background="@mipmap/ic_launcher"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:radius="10dp"
         app:strokeColor="@android:color/holo_red_light"
         app:strokeDashInterval="3dp"
@@ -25,8 +28,6 @@
         android:id="@+id/iv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/bt"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:adjustViewBounds="true"
         android:paddingBottom="20dp"
@@ -34,6 +35,9 @@
         android:paddingRight="15dp"
         android:paddingTop="10dp"
         android:src="@drawable/bibobobibobi"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bt"
         app:radius="20dp"
         app:strokeColor="@android:color/holo_blue_light"
         app:strokeDashInterval="5dp"
@@ -43,19 +47,63 @@
 
     <com.naruto.view.RoundRectRelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/iv"
+        android:layout_height="0dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/bibobobibobi"
-        android:padding="10dp"
+        android:padding="5dp"
+        app:layout_constraintDimensionRatio="H,5:1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv"
         app:radius="15dp"
-        app:strokeColor="@android:color/holo_orange_light"
+        app:strokeColor="@android:color/white"
+        app:strokeDashInterval="5dp"
+        app:strokeDashLength="10dp"
         app:strokeType="dash"
-        app:strokeWidth="2dp">
+        app:strokeWidth="2dp" >
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher" />
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:padding="10dp">
+
+            <ImageView
+                android:id="@+id/iv_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:src="@mipmap/ic_launcher" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/iv_icon"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="手动管理" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/boot_setting_switch_huawei"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHeight_percent="0.5"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
     </com.naruto.view.RoundRectRelativeLayout>
-</RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
